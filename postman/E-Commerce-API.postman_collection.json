@@ -1,0 +1,608 @@
+{
+  "info": {
+    "name": "E-Commerce REST API",
+    "description": "Complete E-Commerce Backend REST API. Users and Products CRUD. API key auth via ?api_key= query parameter (required on protected routes). Success and error test cases included.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000"
+    },
+    {
+      "key": "apiKey",
+      "value": "smit-ecommerce-2024"
+    },
+    {
+      "key": "userId",
+      "value": "1"
+    },
+    {
+      "key": "productId",
+      "value": "1"
+    }
+  ],
+  "item": [
+    {
+      "name": "General",
+      "item": [
+        {
+          "name": "GET API Root",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/",
+              "host": ["{{baseUrl}}"],
+              "path": [""]
+            },
+            "description": "Returns a welcome message and available endpoint groups. Expected: 200"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Unknown Route (Error 404)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/unknown",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "unknown"]
+            },
+            "description": "Any route that does not exist. Expected: 404 with error message."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "1. GET All Users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users"]
+            },
+            "description": "Get all users. Expected: 200 status, list of users."
+          },
+          "response": []
+        },
+        {
+          "name": "2.1 GET Single User (Success 200)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "{{userId}}"]
+            },
+            "description": "Get a user by id. Expected: 200 status, single user."
+          },
+          "response": []
+        },
+        {
+          "name": "2.2 GET Single User - Not Found (Error 404)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/9999",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "9999"]
+            },
+            "description": "User with id 9999 does not exist. Expected: 404."
+          },
+          "response": []
+        },
+        {
+          "name": "2.3 GET Single User - Invalid ID (Error 400)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/abc",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "abc"]
+            },
+            "description": "Non-numeric id. Expected: 400 Invalid user ID."
+          },
+          "response": []
+        },
+        {
+          "name": "3.1 POST Add User (Success 201)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ali Raza Khan\",\n  \"email\": \"ali@example.com\",\n  \"password\": \"secret123\",\n  \"role\": \"customer\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users"]
+            },
+            "description": "Create a user with valid data. Expected: 201 status, created user."
+          },
+          "response": []
+        },
+        {
+          "name": "3.2 POST Add User - Validation Error (Error 400)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"A\",\n  \"email\": \"not-an-email\",\n  \"role\": \"superadmin\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users"]
+            },
+            "description": "Missing/short name, invalid email, missing password, invalid role. Expected: 400 with validation errors array."
+          },
+          "response": []
+        },
+        {
+          "name": "4.1 PUT Update User (Success 200) [PROTECTED]",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ayesha Khan Updated\",\n  \"email\": \"ayesha.updated@example.com\",\n  \"password\": \"newsecret123\",\n  \"role\": \"admin\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/{{userId}}?api_key={{apiKey}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "{{userId}}"],
+              "query": [
+                {
+                  "key": "api_key",
+                  "value": "{{apiKey}}"
+                }
+              ]
+            },
+            "description": "Update a user with valid API key. Expected: 200 status, updated user."
+          },
+          "response": []
+        },
+        {
+          "name": "4.2 PUT Update User - No API Key (Error 401) [PROTECTED]",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ayesha Khan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "{{userId}}"]
+            },
+            "description": "Update without api_key. Expected: 401 API key is required."
+          },
+          "response": []
+        },
+        {
+          "name": "4.3 PUT Update User - Wrong API Key (Error 401) [PROTECTED]",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ayesha Khan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/{{userId}}?api_key=wrong-key",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "{{userId}}"],
+              "query": [
+                {
+                  "key": "api_key",
+                  "value": "wrong-key"
+                }
+              ]
+            },
+            "description": "Update with an invalid API key. Expected: 401 Invalid API key."
+          },
+          "response": []
+        },
+        {
+          "name": "4.4 PUT Update User - Not Found (Error 404) [PROTECTED]",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ghost User\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/9999?api_key={{apiKey}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "9999"],
+              "query": [
+                {
+                  "key": "api_key",
+                  "value": "{{apiKey}}"
+                }
+              ]
+            },
+            "description": "Updating a user that does not exist. Expected: 404."
+          },
+          "response": []
+        },
+        {
+          "name": "5.1 DELETE User (Success 200) [PROTECTED]",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/{{userId}}?api_key={{apiKey}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "{{userId}}"],
+              "query": [
+                {
+                  "key": "api_key",
+                  "value": "{{apiKey}}"
+                }
+              ]
+            },
+            "description": "Delete a user with valid API key. Expected: 200 status, deleted user."
+          },
+          "response": []
+        },
+        {
+          "name": "5.2 DELETE User - No API Key (Error 401) [PROTECTED]",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/2",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "2"]
+            },
+            "description": "Delete without api_key. Expected: 401 API key is required."
+          },
+          "response": []
+        },
+        {
+          "name": "5.3 DELETE User - Not Found (Error 404) [PROTECTED]",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/9999?api_key={{apiKey}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "9999"],
+              "query": [
+                {
+                  "key": "api_key",
+                  "value": "{{apiKey}}"
+                }
+              ]
+            },
+            "description": "Deleting a user that does not exist. Expected: 404."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "6. GET All Products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products"]
+            },
+            "description": "Get all products. Expected: 200 status, list of products."
+          },
+          "response": []
+        },
+        {
+          "name": "7.1 GET Single Product (Success 200)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/products/{{productId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "{{productId}}"]
+            },
+            "description": "Get a product by id. Expected: 200 status, single product."
+          },
+          "response": []
+        },
+        {
+          "name": "7.2 GET Single Product - Not Found (Error 404)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/products/9999",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "9999"]
+            },
+            "description": "Product with id 9999 does not exist. Expected: 404."
+          },
+          "response": []
+        },
+        {
+          "name": "7.3 GET Single Product - Invalid ID (Error 400)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/products/xyz",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "xyz"]
+            },
+            "description": "Non-numeric id. Expected: 400 Invalid product ID."
+          },
+          "response": []
+        },
+        {
+          "name": "8.1 POST Add Product (Success 201) [PROTECTED]",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"USB-C Cable\",\n  \"category\": \"Electronics\",\n  \"price\": 800,\n  \"stock\": 100\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/products?api_key={{apiKey}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products"],
+              "query": [
+                {
+                  "key": "api_key",
+                  "value": "{{apiKey}}"
+                }
+              ]
+            },
+            "description": "Create a product with valid data and API key. Expected: 201 status, created product."
+          },
+          "response": []
+        },
+        {
+          "name": "8.2 POST Add Product - No API Key (Error 401) [PROTECTED]",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"USB-C Cable\",\n  \"category\": \"Electronics\",\n  \"price\": 800,\n  \"stock\": 100\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products"]
+            },
+            "description": "Create a product without api_key. Expected: 401 API key is required."
+          },
+          "response": []
+        },
+        {
+          "name": "8.3 POST Add Product - Validation Error (Error 400) [PROTECTED]",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"X\",\n  \"price\": -50\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/products?api_key={{apiKey}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products"],
+              "query": [
+                {
+                  "key": "api_key",
+                  "value": "{{apiKey}}"
+                }
+              ]
+            },
+            "description": "Short name, missing category, negative price, missing stock. Expected: 400 with validation errors array."
+          },
+          "response": []
+        },
+        {
+          "name": "9.1 PUT Update Product (Success 200) [PROTECTED]",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Wireless Mouse Pro\",\n  \"category\": \"Electronics\",\n  \"price\": 2200,\n  \"stock\": 45\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/products/{{productId}}?api_key={{apiKey}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "{{productId}}"],
+              "query": [
+                {
+                  "key": "api_key",
+                  "value": "{{apiKey}}"
+                }
+              ]
+            },
+            "description": "Update a product with valid API key. Expected: 200 status, updated product."
+          },
+          "response": []
+        },
+        {
+          "name": "9.2 PUT Update Product - No API Key (Error 401) [PROTECTED]",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"price\": 1800\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/products/{{productId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "{{productId}}"]
+            },
+            "description": "Update without api_key. Expected: 401 API key is required."
+          },
+          "response": []
+        },
+        {
+          "name": "9.3 PUT Update Product - Not Found (Error 404) [PROTECTED]",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"price\": 1800\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/products/9999?api_key={{apiKey}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "9999"],
+              "query": [
+                {
+                  "key": "api_key",
+                  "value": "{{apiKey}}"
+                }
+              ]
+            },
+            "description": "Updating a product that does not exist. Expected: 404."
+          },
+          "response": []
+        },
+        {
+          "name": "10.1 DELETE Product (Success 200) [PROTECTED]",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/products/{{productId}}?api_key={{apiKey}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "{{productId}}"],
+              "query": [
+                {
+                  "key": "api_key",
+                  "value": "{{apiKey}}"
+                }
+              ]
+            },
+            "description": "Delete a product with valid API key. Expected: 200 status, deleted product."
+          },
+          "response": []
+        },
+        {
+          "name": "10.2 DELETE Product - No API Key (Error 401) [PROTECTED]",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/products/2",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "2"]
+            },
+            "description": "Delete without api_key. Expected: 401 API key is required."
+          },
+          "response": []
+        },
+        {
+          "name": "10.3 DELETE Product - Not Found (Error 404) [PROTECTED]",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/products/9999?api_key={{apiKey}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "9999"],
+              "query": [
+                {
+                  "key": "api_key",
+                  "value": "{{apiKey}}"
+                }
+              ]
+            },
+            "description": "Deleting a product that does not exist. Expected: 404."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
